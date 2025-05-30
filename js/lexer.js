@@ -94,6 +94,25 @@ export class Lexer {
       } else {
         this.abort("Expected !=, got !" + this.peek());
       }
+    } else if (this.currentChar == '"') {
+      // Get characters between quoatations.
+      const startPos = this.currentPos;
+      this.nextChar();
+
+      while (this.currentChar != '"') {
+        if (
+          this.currentChar == "\n" ||
+          this.currentChar == "\r" ||
+          this.currentChar == "\t" ||
+          this.currentChar == "\%" ||
+          this.currentChar == "\\"
+        ) {
+          this.abort("Illegal character in string");
+        }
+        this.nextChar();
+      }
+      const tokenText = this.source.slice(startPos, this.currentPos);
+      token = new Token(tokenText, TokenType.STRING);
     } else if (this.currentChar == "\n") {
       token = new Token(this.currentChar, TokenType.NEWLINE);
     } else if (this.currentChar == "\0") {
