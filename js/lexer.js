@@ -133,6 +133,20 @@ export class Lexer {
       }
       const tokenText = this.source.slice(startPos, this.currentPos + 1);
       token = new Token(tokenText, TokenType.NUMBER);
+    } else if (/^[A-Za-z]+$/.test(this.currentChar)) {
+      const startPos = this.currentPos;
+      while (/^[A-Za-z0-9]+$/.test(this.peek())) {
+        this.nextChar();
+      }
+
+      const tokenText = this.source.slice(startPos, this.currentPos + 1);
+      const keyword = Token.checkIfKeyword(tokenText);
+
+      if (keyword == null) {
+        token = new Token(tokenText, TokenType.IDENT);
+      } else {
+        token = new Token(tokenText, keyword);
+      }
     } else if (this.currentChar == "\n") {
       token = new Token(this.currentChar, TokenType.NEWLINE);
     } else if (this.currentChar == "\0") {
@@ -149,6 +163,19 @@ export class Token {
   constructor(tokenChar, tokenType) {
     this.char = tokenChar;
     this.type = tokenType;
+  }
+
+  static checkIfKeyword(tokenText) {
+    for (const type in TokenType) {
+      if (
+        type == tokenText &&
+        TokenType[type] >= 100 &&
+        TokenType[type] < 200
+      ) {
+        return TokenType[type];
+      }
+    }
+    return null;
   }
 }
 

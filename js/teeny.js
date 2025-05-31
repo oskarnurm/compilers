@@ -1,6 +1,6 @@
 import { Lexer, TokenType } from "./lexer.js";
 
-let source = "123 9.787 */";
+let source = "IF+-123 foo*THEN/";
 let lexer = new Lexer(source);
 
 let token = lexer.getToken();
