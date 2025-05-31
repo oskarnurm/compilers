@@ -113,6 +113,26 @@ export class Lexer {
       }
       const tokenText = this.source.slice(startPos, this.currentPos);
       token = new Token(tokenText, TokenType.STRING);
+    } else if (/^\d$/.test(this.currentChar)) {
+      // Check if number
+      const startPos = this.currentPos;
+      // Get the whole number if next is also a number
+      while (/^\d$/.test(this.peek())) {
+        this.nextChar();
+      }
+      // Must be decimal
+      if (this.peek() == ".") {
+        this.nextChar();
+        // Next char must be a number
+        if (!/^\d$/.test(this.peek())) {
+          this.abort("Illegal character in number");
+        }
+        while (/^\d$/.test(this.peek())) {
+          this.nextChar();
+        }
+      }
+      const tokenText = this.source.slice(startPos, this.currentPos + 1);
+      token = new Token(tokenText, TokenType.NUMBER);
     } else if (this.currentChar == "\n") {
       token = new Token(this.currentChar, TokenType.NEWLINE);
     } else if (this.currentChar == "\0") {
